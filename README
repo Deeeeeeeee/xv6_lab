@@ -43,3 +43,51 @@ You will need a RISC-V "newlib" tool chain from
 https://github.com/riscv/riscv-gnu-toolchain, and qemu compiled for
 riscv64-softmmu. Once they are installed, and in your shell
 search path, you can run "make qemu".
+
+## 计算分数
+
+make GRADEFLAGS=sleep grade
+./grade-lab-util sleep
+
+## sleep.c
+
+- 如果没有传参数，要 print 错误信息
+- 命令行参数是字符串，可以用 atoi 转换成 int
+- 使用系统调用 sleep
+- 看 kernel/sysproc.c 代码实现 sleep 系统调用(sys_sleep). user/user.h 用户程序调 sleep. user/users.S 汇编代码从用户态跳到内核 for sleep
+- 确定 main 使用 exit() 退出程序
+- 在 Makefile 将自己的 sleep 程序添加到 UPROGS，一旦这么做，make qemu 会编译你的程序，然后你在 xv6 中可以执行它
+
+## pingpong.c
+
+使用管道，父进程发送 bytes 给子进程；子进程 print "<pid>: received ping"，然后发送字节给父进程；父进程收到后 print "<pid>: received pong"
+
+- 使用 pipe
+- fork 创建子进程
+- read() 读，write() 写
+- 使用 getpid 获取 pid
+- 加入 UPROGS 在 Makefile
+
+## primes.c
+
+用 pipe 写一个并发版本的素数筛选，idea: https://swtch.com/~rsc/thread/. 用 pipe 和 fork 创建 pipeline，第一个进程将 2 到 35 放到 pipeline 中。每个素数创建一个进程从管道一边读，然后写到管道另一边
+
+```
+p = get a number from left neighbor
+print p
+loop:
+    n = get a number from left neighbor
+    if (p does not divide n)
+        send n to right neighbor
+```
+
+- 要 close 调不需要的 fd
+- 一旦第一个进程达到 35，它需要等待整个 pipeline 中断，包括所有的子进程
+- write-side 的管道关闭 read 会返回 0
+- 写 32-bit 的 int 到管道比格式化 ASCII I/O 简单
+- 只有 pipeline 需要的时候，才创建它
+- 加入到 UPROGS 中
+
+思路：
+- 从管道拿数据，如果
+
