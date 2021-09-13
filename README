@@ -44,6 +44,14 @@ https://github.com/riscv/riscv-gnu-toolchain, and qemu compiled for
 riscv64-softmmu. Once they are installed, and in your shell
 search path, you can run "make qemu".
 
+## 准备
+
+按照官网安装 https://pdos.csail.mit.edu/6.828/2020/tools.html
+
+```
+sudo apt-get install git build-essential gdb-multiarch qemu-system-misc gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu
+```
+
 ## 计算分数
 
 make GRADEFLAGS=sleep grade
@@ -89,5 +97,20 @@ loop:
 - 加入到 UPROGS 中
 
 思路：
-- 从管道拿数据，如果
+- 父进程写数字
+- 子进程递归调用 prime
+- 子进程 read 到 0 时，表示父进程 write close 了
+- wait 只会等待子进程结束，不会等待孙子进程结束。所以父进程直接 wait 就行，子进程再直接 wait 孙子进程...
+
+## find.c
+
+写一个简单版本的 unix find 程序，在目录树下找特定文件名的文件
+
+- 参考 user/ls.c 怎么读目录的
+- 使用递归来向下 find 子目录
+- 不要递归 "." 和 ".."
+- 改变文件系统，要 make clean 然后 make qemu
+- 要用到 C strings. 可以参考 C 语言的数 5.5 章节
+- 比较字符串要用 strcmp()
+- 添加程序到 UPROGS 到 Makefile 中
 
