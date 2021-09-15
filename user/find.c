@@ -41,6 +41,7 @@ void find(char *path, char *target)
     switch(st.type){
         // 如果是文件，则判断是否目标文件
         case T_FILE:
+            printf("====");
             filename = fmtname(path);
             if (strcmp(filename, target) == 0)
                 printf("%s\n", fmtname(path));
@@ -57,8 +58,12 @@ void find(char *path, char *target)
             while(read(fd, &de, sizeof(de)) == sizeof(de)){
                 if(de.inum == 0)
                     continue;
+                filename = fmtname(buf);
+                printf("aaa====%s\n", filename);
+                if (!strcmp(filename, ".") || !strcmp(filename, "..")) continue;
                 memmove(p, de.name, DIRSIZ);
                 p[DIRSIZ] = 0;
+                printf("%s,%s\n", buf, target);
                 find(buf, target);
             }
             break;
@@ -69,7 +74,6 @@ void find(char *path, char *target)
 // 找到path的文件名
 char* fmtname(char *path)
 {
-    static char buf[DIRSIZ + 1];
     char *p;
 
     // Find first character after last slash.
@@ -77,11 +81,6 @@ char* fmtname(char *path)
         ;
     p++;
 
-    // Return blank-padded name.
-    if (strlen(p) >= DIRSIZ)
-        return p;
-    memmove(buf, p, strlen(p));
-    memset(buf + strlen(p), ' ', DIRSIZ - strlen(p));
-    return buf;
+    return p;
 }
 
