@@ -118,3 +118,32 @@ loop:
 - 读当前目录下的文件和文件夹，如果是文件夹，递归它
 - 如果是文件，判断名字是否相同
 
+## xargs.c
+
+写一个简单版本的 unix xargs 程序，从标准输入读取，然后each line执行一个命令，提供命令行作为参数
+
+例子. 下面的例子相当于 echo bye hello too
+```
+$ echo hello too | xargs echo bye
+bye hello too
+```
+
+- 使用 fork 和 exec 来调用每一行输入. 在父进程用 wait 去等待子进程完成命令
+- 为了独立读取每行输入，一次只读一个字符知道新行出现 '\n'
+- kernel/param.h 声明了 MAXARG，当你声明一个 argv 数组时可能有用
+- 添加程序到 UPROGS 到 Makefile 中
+- 改变文件系统，要 make clean 然后 make qemu
+
+测试
+
+```
+$ make qemu
+...
+init: starting sh
+$ sh < xargstest.sh
+$ $ $ $ $ $ hello
+hello
+hello
+$ $ 
+```
+
