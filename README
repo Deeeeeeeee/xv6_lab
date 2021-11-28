@@ -129,7 +129,7 @@ bye hello too
 ```
 
 - 使用 fork 和 exec 来调用每一行输入. 在父进程用 wait 去等待子进程完成命令
-- 为了独立读取每行输入，一次只读一个字符知道新行出现 '\n'
+- 为了独立读取每行输入，一次只读一个字符直到新行出现 '\n'
 - kernel/param.h 声明了 MAXARG，当你声明一个 argv 数组时可能有用
 - 添加程序到 UPROGS 到 Makefile 中
 - 改变文件系统，要 make clean 然后 make qemu
